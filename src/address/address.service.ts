@@ -15,6 +15,9 @@ export class AddressService {
     createAddressDto: CreateAddressDto,
     userId: number,
   ): Promise<AddressEntity> {
-    return this.addressRepository.save({});
+    return this.addressRepository.save({
+      ...createAddressDto,
+      userId,
+    });
   }
 }
