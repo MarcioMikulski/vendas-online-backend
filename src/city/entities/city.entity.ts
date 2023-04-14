@@ -29,5 +29,5 @@ export class CityEntity {
 
   @ManyToOne(() => StateEntity, (state) => state.cities)
   @JoinColumn({ name: 'state_id', referencedColumnName: 'id' })
-  state?: StateEntity;
+  state: StateEntity;
 }
