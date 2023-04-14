@@ -2,31 +2,34 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/createUser.dto';
-import { UserService } from './user.service';
+import { ReturnUserDto } from './dtos/returnUser.dto';
 import { UserEntity } from './entities/user.entity';
-import { ReturnUserDto } from './dtos/return.User.dto';
-
+import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
   @UsePipes(ValidationPipe)
   @Post()
   async createUser(@Body() createUser: CreateUserDto): Promise<UserEntity> {
     return this.userService.createUser(createUser);
   }
-
   @Get()
   async getAllUser(): Promise<ReturnUserDto[]> {
     return (await this.userService.getAllUser()).map(
       (userEntity) => new ReturnUserDto(userEntity),
     );
   }
-}
 
-//npm run start para iniciar o nest e toda mudança ele reinicia automatico
+  @Get('/:userId')
+  async getUserById(@Param('userId') userId: number): Promise<ReturnUserDto> {
+    return new ReturnUserDto(
+      await this.userService.getUserByIdUsingRelations(userId),
+    );
+  }
+}

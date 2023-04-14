@@ -4,38 +4,42 @@ import { hash } from 'bcrypt';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserEntity } from './entities/user.entity';
-
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
-
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const saltOrRounds = 10;
-
     const passwordHashed = await hash(createUserDto.password, saltOrRounds);
-
     return this.userRepository.save({
       ...createUserDto,
-      type_User: 1,
+      typeUser: 1,
       password: passwordHashed,
     });
   }
+
+  async getUserByIdUsingRelations(userId: number): Promise<UserEntity> {
+    return this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+      relations: ['addresses'],
+    });
+  }
+
   async getAllUser(): Promise<UserEntity[]> {
     return this.userRepository.find();
   }
-
   async findUserById(userId: number): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       where: {
         id: userId,
       },
     });
-
     if (!user) {
-      throw new NotFoundException(`userId Not Found`);
+      throw new NotFoundException(`UserId: ${userId} Not Found`);
     }
     return user;
   }
